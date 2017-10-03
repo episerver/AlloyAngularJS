@@ -1,7 +1,14 @@
-@using AlloyAngularJS
+@using EPiServer
+@using EPiServer.Core
+@using EPiServer.Editor
+@using EPiServer.ServiceLocation
+@using Global = AlloyAngularJS.Global
 @model PageViewModel<ProductPage>
 
 @{ Layout = "~/Views/Shared/Layouts/_TwoPlusOne.cshtml"; }
+
+@* This tells the page to reload whenever the page image changes. Try turning it off. It'll allow OPE to re-render the image element, but that will remove our <pre>-tag. *@
+@Html.FullRefreshPropertiesMetaData(new[] { "PageImage" })
 
 <h1 @Html.EditAttributes(x => x.CurrentPage.PageName)>@Model.CurrentPage.PageName</h1>
 <p class="introduction" @Html.EditAttributes(x => x.CurrentPage.MetaDescription)>@Model.CurrentPage.MetaDescription</p>
@@ -15,7 +22,11 @@
 @section RelatedContent
 {
     <div @Html.EditAttributes(x => x.CurrentPage.PageImage)>
-        <img src="@Url.ContentUrl(Model.CurrentPage.PageImage)"/>
+        <img src="@Url.ContentUrl(Model.CurrentPage.PageImage)" />
+        @if (PageEditing.PageIsInEditMode)
+        {
+            <pre>Drag an image here to test OPE without Angular. This pre-element won't dissappear because we're reloading the page on property update (see the @@Html helper above in the Razor view).<br/>Image name: "@(ServiceLocator.Current.GetInstance<IContentLoader>().Get<IContent>(Model.CurrentPage.PageImage).Name)"</pre>
+        }
     </div>
 
     <div class="block colorBox @string.Join(" ", @Model.CurrentPage.GetThemeCssClassNames())">
