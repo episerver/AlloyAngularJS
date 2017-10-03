@@ -10,3 +10,12 @@ User: cmsadmin
 Password: sparr0wHawk!
 
 ## Examples
+
+### Image property used in a nested HTML element 
+
+![Example of replacing an image that keeps the DOM and allows AngularJS to update it instead](example-productpage-image.gif)
+
+Interesting files:
+* Controllers/ImageFileController.cs
+* Static/angularjs/ProductPageController.js
+* Views/ProductPage/Index.cshtml
