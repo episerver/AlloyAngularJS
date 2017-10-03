@@ -7,6 +7,7 @@
         "mocha": true
     },
     "globals": {
+        "angular": true,
         "expect": true,
         "sinon": true,
         "module": true,

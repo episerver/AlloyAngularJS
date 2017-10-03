@@ -1,6 +1,8 @@
 using System.Web.Mvc;
 using AlloyAngularJS.Models.Media;
 using AlloyAngularJS.Models.ViewModels;
+using EPiServer;
+using EPiServer.Core;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
 
@@ -12,10 +14,12 @@ namespace AlloyAngularJS.Controllers
     public class ImageFileController : PartialContentController<ImageFile>
     {
         private readonly UrlResolver _urlResolver;
+        private readonly IContentLoader _contentLoader;
 
-        public ImageFileController(UrlResolver urlResolver)
+        public ImageFileController(UrlResolver urlResolver, IContentLoader contentLoader)
         {
             _urlResolver = urlResolver;
+            _contentLoader = contentLoader;
         }
 
         /// <summary>
@@ -32,6 +36,23 @@ namespace AlloyAngularJS.Controllers
             };
 
             return PartialView(model);
+        }
+
+        /// <summary>
+        /// Gets image data. Used by Angular controllers to update the page without a page reload.
+        /// </summary>
+        /// <param name="contentLink">The content reference to the image.</param>
+        /// <returns>An object with the name and URL of the image.</returns>
+        public JsonResult Data(ContentReference contentLink)
+        {
+            var image = _contentLoader.Get<ImageFile>(contentLink);
+
+            return Json(new
+                {
+                    name = image.Name,
+                    url = _urlResolver.GetUrl(contentLink)
+                },
+                JsonRequestBehavior.AllowGet);
         }
     }
 }

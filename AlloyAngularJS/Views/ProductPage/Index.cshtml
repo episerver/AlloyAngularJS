@@ -1,14 +1,15 @@
-@using EPiServer
-@using EPiServer.Core
 @using EPiServer.Editor
-@using EPiServer.ServiceLocation
 @using Global = AlloyAngularJS.Global
 @model PageViewModel<ProductPage>
 
 @{ Layout = "~/Views/Shared/Layouts/_TwoPlusOne.cshtml"; }
 
-@* This tells the page to reload whenever the page image changes. Try turning it off. It'll allow OPE to re-render the image element, but that will remove our <pre>-tag. *@
-@Html.FullRefreshPropertiesMetaData(new[] { "PageImage" })
+<script>
+    window.pageModel = {
+        contentLink: "@Model.CurrentPage.ContentLink",
+        pageImage: "@Model.CurrentPage.PageImage"
+    };
+</script>
 
 <h1 @Html.EditAttributes(x => x.CurrentPage.PageName)>@Model.CurrentPage.PageName</h1>
 <p class="introduction" @Html.EditAttributes(x => x.CurrentPage.MetaDescription)>@Model.CurrentPage.MetaDescription</p>
@@ -21,11 +22,14 @@
 
 @section RelatedContent
 {
-    <div @Html.EditAttributes(x => x.CurrentPage.PageImage)>
-        <img src="@Url.ContentUrl(Model.CurrentPage.PageImage)" />
+<div ng-controller="productPageRelatedContentController as ctrl">
+
+    <!-- This the element we're going to update through Angular. Notice the two attributes! If the property type was a string you'd want to add `data-epi-property-edittype="floating"`. -->
+    <div data-epi-property-name="PageImage" data-epi-property-render="none">
+        <img ng-src="{{ctrl.pageImageUrl}}" alt="{{ctrl.pageImageName}}"/>
         @if (PageEditing.PageIsInEditMode)
         {
-            <pre>Drag an image here to test OPE without Angular. This pre-element won't dissappear because we're reloading the page on property update (see the @@Html helper above in the Razor view).<br/>Image name: "@(ServiceLocator.Current.GetInstance<IContentLoader>().Get<IContent>(Model.CurrentPage.PageImage).Name)"</pre>
+            <pre>Drag an image here to test OPE with Angular!<br/>Image name: {{ctrl.pageImageName}}</pre>
         }
     </div>
 
@@ -35,4 +39,5 @@
     </div>
 
     @Html.PropertyFor(x => x.CurrentPage.RelatedContentArea, new { CssClass = "row", Tag = Global.ContentAreaTags.OneThirdWidth })
+</div>
 }
